@@ -21,7 +21,7 @@ const App = () => {
   const { isLoggedIn } = useContext(UserContext);
   const { pathname } = useLocation();
 
-  axios.defaults.baseURL = 'http://localhost:4001';
+  axios.defaults.baseURL = 'https://moviepedia-backend.onrender.com';
   axios.defaults.withCredentials = true;
 
   return (
