@@ -11,7 +11,7 @@ const path = require('path');
 
 const Users = require('./models/Users');
 const Watchlist = require('./models/Watchlist');
-const LikedContent = require('./models/LikedContent');
+const Favourite = require('./models/Favourite');
 
 app.use(cookieParser());
 app.use(express.static('public'));
@@ -96,6 +96,7 @@ app.post('/login', upload.none(), async (req, res) => {
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
   if (token) {
+    //Verify the token 
     jwt.verify(token, jwtSecret, {}, (err, data) => {
       if (err) throw err;
       res.json(data);
@@ -105,38 +106,45 @@ app.get('/profile', (req, res) => {
   }
 })
 
+//Adding content to watchlist
 app.post('/watchlist', async (req, res) => {
-  const { userId, contentId, contentType } = req.body;
+  const { userId, contentId, type } = req.body;
   try {
+    // Find the watchlist for the given userId
     const watchlist = await Watchlist.findOne({ userId });
-
-    if (watchlist) {
-      const contentIndex = watchlist.content.findIndex(item => item.contentId === contentId);
-
-      if (contentIndex !== -1) {
-        watchlist.content.splice(contentIndex, 1);
-        await watchlist.save();
-        return res.status(200).json("Removed from watchlist");
-      } else {
-        watchlist.content.push({ contentId, contentType });
-        await watchlist.save();
-        return res.status(200).json("Content added to watchlist");
-      }
-    } else {
-      const newWatchlist = await Watchlist.create({
-        userId,
-        content: [{ contentId, contentType }]
+    if (!watchlist) {
+      // No watchlist exists, create a new one
+      const newWatchlist = new Watchlist({
+        userId: userId,
+        content: [],
       });
-      return res.status(200).json("Content added to watchlist");
+      newWatchlist.content.push({ contentId, type });
+      await newWatchlist.save();
+      return res.json({ message: 'Content added to watchlist' });
     }
-  } catch (err) {
-    res.status(500).json("You need to login first");
+    // Check if the content is already present
+    const existingContentIndex = watchlist.content.findIndex(
+      (c) => c.contentId == contentId
+    );
+    if (existingContentIndex !== -1) {
+      // Content already exists, remove it from the watchlist
+      watchlist.content.splice(existingContentIndex, 1);
+      await watchlist.save();
+      return res.json({ message: 'Content removed from watchlist' });
+    }
+    // Content not present, add it to the watchlist
+    const newContent = { contentId, type };
+    watchlist.content.push(newContent);
+    await watchlist.save();
+    return res.json({ message: 'Content added to watchlist' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
   }
 });
 
 
-
-app.get('/watchlists', async (req, res) => {
+app.get('/watchlistSection', async (req, res) => {
   const { userId } = req.query;
   try {
     const user = await Watchlist.findOne({ userId });
@@ -151,33 +159,48 @@ app.get('/watchlists', async (req, res) => {
   }
 });
 
-app.post('/likedcontent', async (req, res) => {
-  const { userId, contentId } = req.body;
+app.post('/favourite', async (req, res) => {
+  const { userId, contentId, type } = req.body;
   try {
-    const likedContent = await LikedContent.findOne({ userId });
-
-    if (likedContent) {
-      if (likedContent.contentId.includes(contentId)) {
-        await LikedContent.deleteOne({ userId, contentId });
-        return res.status(200).json("Removed from Liked Section");
-      }
-      likedContent.contentId.push(contentId);
-      await likedContent.save();
-      return res.status(200).json("Added to Liked Section");
+    // Find the favourites for the given userId
+    const favourite = await Favourite.findOne({ userId });
+    if (!favourite) {
+      // No favourites exists, create a new one
+      const newFavourite = new Favourite({
+        userId: userId,
+        content: [],
+      });
+      newFavourite.content.push({ contentId, type });
+      await newFavourite.save();
+      return res.json({ message: 'Content added to favourites' });
     }
-    const newLikedContent = await LikedContent.create({ userId, contentId: [contentId] });
-    res.status(200).json("Added to Liked Section");
-  } catch (err) {
-    res.status(500).json(err);
+    // Check if the content is already present
+    const existingContentIndex = favourite.content.findIndex(
+      (c) => c.contentId == contentId
+    );
+    if (existingContentIndex !== -1) {
+      // Content already exists, remove it from the favourites
+      favourite.content.splice(existingContentIndex, 1);
+      await favourite.save();
+      return res.json({ message: 'Content removed from favourites' });
+    }
+    // Content not present, add it to the watchlist
+    const newContent = { contentId, type };
+    favourite.content.push(newContent);
+    await favourite.save();
+    return res.json({ message: 'Content added to favourites' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.get('/likedsection', async (req, res) => {
+app.get('/favouriteSection', async (req, res) => {
   const { userId } = req.query;
   try {
-    const user = await LikedContent.findOne({ userId });
+    const user = await Favourite.findOne({ userId });
     if (user) {
-      const contentIds = user.contentId;
+      const contentIds = user.content;
       res.status(200).json(contentIds);
     } else {
       res.status(404).json("User not found");

@@ -18,7 +18,7 @@ const UpcomingMovies = () => {
     <div className="bg-black h-fit text-center text-white">
       <h2 className="text-3xl p-10">Movies Coming Soon...</h2>
 
-      <DisplayContent content={movies} />
+      <DisplayContent content={movies} contentType={" Movies"} />
     </div>
   );
 };

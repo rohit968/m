@@ -1,48 +1,84 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoBookmark, IoHeart } from "react-icons/io5";
 import { TiTick } from "react-icons/ti";
 import { AiOutlinePlus } from "react-icons/ai";
 import { UserContext } from "../../UserContext";
 import axios from "axios";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const WatchlistLikedContent = ({ content, watchlistedContent, type }) => {
+const WatchlistLikedContent = ({
+  content,
+  watchlistedContent,
+  favouriteContent,
+  type,
+}) => {
   const [mainError, setMainError] = useState();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [isWatchlisted, setIsWatchlisted] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isFavourite, setIsFavourite] = useState(false);
   const contentId = content?.id;
   const { userData } = useContext(UserContext);
+  const [showModal, setShowModal] = useState(false);
 
   const isHome = pathname === "/";
   const isDetail = pathname === `/detail/${content?.id}`;
 
+  if (userData === null) {
+    navigate("/");
+  }
+
+  useEffect(() => {
+    if (showModal) {
+      const timer = setTimeout(() => {
+        setShowModal(false);
+      }, 5000);
+      navigate(pathname);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [showModal]);
+
   const handleWatchlist = async () => {
     try {
-      await axios.post("/watchlist", {
-        userId: userData?.userId,
-        contentId,
-        type,
-      });
+      await axios
+        .post("/watchlist", {
+          userId: userData?.userId,
+          contentId,
+          type,
+        })
+        .then((res) => {
+          setMainError(res.data.message);
+        });
       setIsWatchlisted(!isWatchlisted);
+      setShowModal(true);
     } catch (err) {
       setMainError(err.response.data);
+      setShowModal(true);
       setTimeout(() => {
         navigate("/registerlogin");
       }, 3000);
     }
   };
 
-  const handleLikedContent = async () => {
+  const handleFavouriteContent = async () => {
     try {
-      await axios.post("/likedcontent", {
-        userId: userData?.userId,
-        contentId,
-      });
-      setIsLiked(!isLiked);
+      await axios
+        .post("/favourite", {
+          userId: userData?.userId,
+          contentId,
+          type,
+        })
+        .then((res) => {
+          setMainError(res.data.message);
+        });
+      setIsFavourite(!isFavourite);
+      setShowModal(true);
     } catch (err) {
       console.log(err.response.data);
+      setShowModal(true);
       setTimeout(() => {
         navigate("/registerlogin");
       }, 3000);
@@ -51,10 +87,14 @@ const WatchlistLikedContent = ({ content, watchlistedContent, type }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      {mainError && (
-        <p className="bg-red-900 text-white mx-auto mt-2 w-fit px-1.5  py-1 rounded-md text-sm">
-          {mainError}. Redirecting...
-        </p>
+      {showModal && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white px-6 py-3 rounded-md">
+          {mainError ? (
+            <p>{mainError}</p>
+          ) : (
+            <p>Watchlist added successfully.</p>
+          )}
+        </div>
       )}
       {!isDetail && (
         <div
@@ -75,9 +115,11 @@ const WatchlistLikedContent = ({ content, watchlistedContent, type }) => {
           <div className="bg-slate-400 rounded-full p-1">
             <IoHeart
               className={`cursor-pointer ${
-                isLiked ? "text-red-500" : "text-white"
+                isFavourite || favouriteContent?.id === contentId
+                  ? "text-red-500"
+                  : "text-white"
               }`}
-              onClick={handleLikedContent}
+              onClick={handleFavouriteContent}
             />
           </div>
         </div>
@@ -102,9 +144,9 @@ const WatchlistLikedContent = ({ content, watchlistedContent, type }) => {
           <div className="bg-slate-500 text-2xl p-1 rounded-lg">
             <IoHeart
               className={`cursor-pointer ${
-                isLiked ? "text-red-500" : "text-white"
+                isFavourite ? "text-red-500" : "text-white"
               }`}
-              onClick={handleLikedContent}
+              onClick={handleFavouriteContent}
             />
           </div>
         </div>

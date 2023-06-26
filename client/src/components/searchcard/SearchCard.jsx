@@ -38,7 +38,6 @@ const SearchCard = ({ content }) => {
         className={`text-white h-full rounded-lg ${
           isPathSearch ? "w-3/4" : "w-32"
         } cursor-pointer  transition-all duration-500 transform hover:scale-110 hover:brightness-70`}
-        onClick={handleContentDetails}
       >
         <img
           src={
@@ -49,8 +48,11 @@ const SearchCard = ({ content }) => {
           }
           alt={content?.title}
           className="w-full h-48 object-cover rounded-lg"
+          onClick={handleContentDetails}
         />
-        <WatchlistLikedContent content={content} />
+        <div className="z-99">
+          <WatchlistLikedContent content={content} type={contentType} />
+        </div>
 
         {isPathSearch && (
           <>

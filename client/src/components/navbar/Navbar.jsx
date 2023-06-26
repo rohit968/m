@@ -103,7 +103,7 @@ const Navbar = () => {
               </Link>
 
               <Link
-                to="/likes"
+                to="/favourite"
                 className="border-b border-red-500"
                 onClick={() => setAccountToggle(false)}
               >

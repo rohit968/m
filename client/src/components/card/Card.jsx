@@ -3,7 +3,12 @@ import noImage from "../../assets/no-movie-image.webp";
 import { useLocation, useNavigate } from "react-router-dom";
 import WatchlistLikedContent from "../watchlist&likebutton/Watchlist&LikedContent";
 
-const Card = ({ content, contentType, watchlistedContent }) => {
+const Card = ({
+  content,
+  contentType,
+  watchlistedContent,
+  favouriteContent,
+}) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -49,6 +54,7 @@ const Card = ({ content, contentType, watchlistedContent }) => {
             content={content}
             type={contentType}
             watchlistedContent={watchlistedContent}
+            favouriteContent={favouriteContent}
           />
         </div>
       </div>

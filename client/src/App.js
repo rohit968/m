@@ -9,7 +9,7 @@ import {
   MoreMovies,
   DetailPage,
   Watchlist,
-  LikedPage,
+  Favourite,
   RegisterLoginPage,
   Footer,
   NotFound
@@ -21,7 +21,7 @@ const App = () => {
   const { isLoggedIn } = useContext(UserContext);
   const { pathname } = useLocation();
 
-  axios.defaults.baseURL = 'https://moviepedia-backend.onrender.com';
+  axios.defaults.baseURL = 'http://localhost:4001';
   axios.defaults.withCredentials = true;
 
   return (
@@ -39,7 +39,7 @@ const App = () => {
             <Route path="/registerlogin" element={<RegisterLoginPage pathname={pathname} />} />
           )}
           <Route path="/watchlist" element={<Watchlist />} />
-          <Route path="/likes" element={<LikedPage />} />
+          <Route path="/favourite" element={<Favourite />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />

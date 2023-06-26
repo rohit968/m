@@ -5,10 +5,10 @@ import TVShows from './TVShows'
 import MoreMovies from './MoreMovies';
 import DetailPage from './DetailPage';
 import Watchlist from './Watchlist';
-import LikedPage from './LikedPage';
+import Favourite from './Favourite';
 import RegisterLoginPage from "./Register&LoginPage";
 import Footer from './Footer'
 import NotFound from './NotFound';
 
 
-export { Home, Search, Movies, TVShows, MoreMovies, DetailPage, LikedPage, Watchlist, RegisterLoginPage, Footer, NotFound }
+export { Home, Search, Movies, TVShows, MoreMovies, DetailPage, Favourite, Watchlist, RegisterLoginPage, Footer, NotFound }
