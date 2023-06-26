@@ -3,12 +3,11 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import api_base_url from "../../pages/api_base_url";
-import WatchlistLikedContent from "../watchlist&likebutton/Watchlist&LikedContent";
 import CarouselCard from "./CarouselCard";
+import { useNavigate } from "react-router-dom";
 
 const Carousel = () => {
   const [trending, setTrending] = useState([]);
-  // const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -19,15 +18,6 @@ const Carousel = () => {
     };
     fetchTrending();
   }, []);
-
-  console.log(trending);
-
-  // const handleDetail = (content, contentType) => {
-  //   console.log(content);
-  //   navigate(`/detail/${content}`, {
-  //     state: { contentType },
-  //   });
-  // };
 
   const settings = {
     dots: false,
@@ -63,7 +53,11 @@ const Carousel = () => {
     <div className="bg-black h-screen">
       <Slider {...settings} className="h-full w-full">
         {trending?.map((t, index) => (
-          <CarouselCard t={t} movieId={t?.id} key={index} />
+          <CarouselCard
+            trendingContent={t}
+            trendingContentId={t?.id}
+            key={index}
+          />
         ))}
       </Slider>
     </div>

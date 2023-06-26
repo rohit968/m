@@ -40,7 +40,7 @@ const Favourite = () => {
       }
       setContent(data);
     };
-  }, [isLoggedIn, userId, navigate]);
+  }, [isLoggedIn, userId]);
 
   return (
     <div className="bg-black">
