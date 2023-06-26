@@ -24,10 +24,6 @@ const WatchlistLikedContent = ({
   const isHome = pathname === "/";
   const isDetail = pathname === `/detail/${content?.id}`;
 
-  if (userData === null) {
-    navigate("/");
-  }
-
   useEffect(() => {
     if (showModal) {
       const timer = setTimeout(() => {
